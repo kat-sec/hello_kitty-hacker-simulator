@@ -2,13 +2,14 @@
 #include "splashkit.h" // Splashkit library
 #include <memory>    // For smart pointers
 #include <fstream>   // For file handling
+#include <algorithm> // For std::find 
 using std::to_string;
 
-// Implement smart pointers
+// Smart pointers for font and bitmap
 std::shared_ptr<font> game_font_ptr;
 std::shared_ptr<bitmap> hello_kitty_image_ptr;
 
-// game_font function to handle missing font
+// Load the game font, fallback to default if missing
 font &game_font()
 {
     if (!game_font_ptr)
@@ -26,7 +27,7 @@ font &game_font()
     return *game_font_ptr;
 }
 
-// Update the bitmap loading to use a shared pointer
+// Load Hello Kitty image using a shared pointer
 void load_hello_kitty_image()
 {
     if (!hello_kitty_image_ptr)
@@ -74,10 +75,10 @@ BruteForce brute_force;
 Progress progress;
 UIState ui_state;
 
-// Add a flag to track input mode
+// Track input mode (username or password)
 bool is_entering_username = true;
 
-// Define a structure for hearts
+// Structure for heart shapes
 struct Heart
 {
     double x, y;       // Position of the heart
@@ -86,10 +87,10 @@ struct Heart
     color heart_color; // Color of the heart
 };
 
-// Vector to store active hearts
+// Store active hearts
 std::vector<Heart> hearts;
 
-// Function to generate new hearts across the screen
+// Generate new hearts across the screen
 void generate_hearts()
 {
     while (hearts.size() < 10)
@@ -104,7 +105,7 @@ void generate_hearts()
     }
 }
 
-// Function to draw a heart shape
+// Draw a heart shape
 void draw_heart(double x, double y, double size, color heart_color)
 {
     const int points = 100;
@@ -154,7 +155,7 @@ void update_and_draw_hearts()
     }
 }
 
-// Function to draw a button
+// Draw a button
 void draw_button(int x, int y, string text, bool hovered)
 {
     if (hovered)
@@ -167,13 +168,13 @@ void draw_button(int x, int y, string text, bool hovered)
     draw_text(text, COLOR_DEEP_PINK, game_font(), 20, x + (200 - text_width(text, game_font(), 20)) / 2, y + 15);
 }
 
-// Function to check if the mouse is over the button
+// Check if the mouse is over the button
 bool is_mouse_over_button(int x, int y)
 {
     return mouse_x() >= x && mouse_x() <= x + 200 && mouse_y() >= y && mouse_y() <= y + 50;
 }
 
-// Function to generate random IP addresses
+// Generate random IP addresses
 string generate_ip_addresses()
 {
     return to_string(rnd(1, 255)) + "." +
@@ -191,10 +192,10 @@ void generate_and_store_ip_addresses(IPScanner &ip_scanner)
     }
 }
 
-// draw_ip_addresses function
+// Draw IP addresses
 void draw_ip_addresses(const IPScanner &ip_scanner)
 {
-    // Modify logic to hide "IP Addresses nearby:" text until scan is started
+    // Hide "IP Addresses nearby:" text until scan is started
     if (!ip_scanner.ip_addresses.empty())
     {
         draw_text("IP Addresses nearby:", COLOR_BLACK, "Arial", 30, 590, 100);
@@ -207,7 +208,7 @@ void draw_ip_addresses(const IPScanner &ip_scanner)
     }
 }
 
-// Function to draw a rotating spinner
+// Draw a rotating spinner
 void draw_spinner(int x, int y, double angle)
 {
     for (int i = 0; i < 8; i++)
@@ -222,7 +223,7 @@ void draw_spinner(int x, int y, double angle)
     }
 }
 
-// Function to generate brute-force effect
+// Generate brute-force effect
 string generate_brute_force(int length)
 {
     string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
@@ -235,7 +236,7 @@ string generate_brute_force(int length)
     return guess;
 }
 
-// Function to read potential passwords from a file
+// Read potential passwords from a file
 std::vector<std::string> read_passwords_from_file(const std::string &filename)
 {
     std::vector<std::string> passwords;
@@ -258,7 +259,7 @@ std::vector<std::string> read_passwords_from_file(const std::string &filename)
 // Forward declaration for encrypt_password
 string encrypt_password(const string &password, int shift);
 
-// Updated brute-force function to use passwords from the correct 'details' file
+// Brute-force function using passwords from the 'details' file
 void simulate_brute_force(BruteForce &brute_force)
 {
     if (!brute_force.target_password.empty())
@@ -282,7 +283,7 @@ void simulate_brute_force(BruteForce &brute_force)
             current_index = 0;
             file_exhausted = false;
             brute_force_attempts = 0;
-            brute_force.current_guess = "";                            // Force empty guess for proper initialization
+            brute_force.current_guess = "";                            // Force empty guess for proper initialisation
             last_target = brute_force.target_password;                 // Update last target
             last_target_length = brute_force.target_password.length(); // Update length tracking
         }
@@ -312,7 +313,7 @@ void simulate_brute_force(BruteForce &brute_force)
             const string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
             const size_t charset_size = charset.size();
 
-            // Initialize with single character for systematic brute force
+            // Initialise with single character for systematic brute force
             if (brute_force.current_guess.empty())
             {
                 brute_force.current_guess = string(1, charset[0]);
@@ -347,7 +348,7 @@ void simulate_brute_force(BruteForce &brute_force)
                     continue;
                 }
 
-                // Increment guess lexicographically
+                // Increment guess 
                 size_t i = brute_force.current_guess.size() - 1;
                 while (true)
                 {
@@ -401,15 +402,15 @@ void simulate_brute_force(BruteForce &brute_force)
         // Apply Caesar cipher with shift of 3
         string encrypted_password = encrypt_password(brute_force.target_password, 3);
 
-        // Display success message with more prominent colors - moved to a higher position
+        // Display success message with more prominent colors 
         draw_text("SUCCESS! Password Cracked: " + brute_force.target_password, COLOR_HOT_PINK, "Arial", 24, 300, 480);
 
-        // Make the encrypted password more visible - moved to a higher position
+        // Make the encrypted password more visible 
         draw_text("Caesar Cipher (Shift 3): " + encrypted_password, COLOR_MEDIUM_VIOLET_RED, "Arial", 24, 300, 510);
     }
 }
 
-// Function to draw username input box
+// Draw username input box
 void draw_username_input(const string &username, bool is_active)
 {
     draw_text("Enter Username: ", COLOR_BLACK, "Arial", 20, 150, 120);
@@ -417,7 +418,7 @@ void draw_username_input(const string &username, bool is_active)
     draw_text(username, COLOR_BLACK, "Arial", 20, 305, 125);
 }
 
-// Function to draw the password input box
+// Draw the password input box
 void draw_password_input(const string &input_password, bool is_active)
 {
     draw_text("Enter Password: ", COLOR_BLACK, "Arial", 20, 150, 170);
@@ -428,7 +429,7 @@ void draw_password_input(const string &input_password, bool is_active)
     draw_text(masked_password, COLOR_BLACK, "Arial", 20, 305, 175);
 }
 
-// Function to reset all variables when restarting
+// Reset all variables when restarting
 void reset_game()
 {
     progress.value = 0;                   // Reset progress bar
@@ -453,7 +454,7 @@ void draw_progress_bar(Progress &progress)
     }
 }
 
-// Function to encrypt a string using a Caesar cipher
+// Encrypt a string using a Caesar cipher
 string encrypt_password(const string &password, int shift)
 {
     string encrypted = "";
@@ -472,7 +473,7 @@ string encrypt_password(const string &password, int shift)
     return encrypted;
 }
 
-// Function to save username and password to a file
+// Save username and password to a file
 void save_user_data(const std::string &filename)
 {
     std::ofstream outFile(filename);
@@ -487,7 +488,7 @@ void save_user_data(const std::string &filename)
     }
 }
 
-// Function to load username and password from a file
+// Load username and password from a file
 void load_user_data(const std::string &filename)
 {
     std::ifstream inFile(filename);
@@ -502,7 +503,7 @@ void load_user_data(const std::string &filename)
     }
 }
 
-// Function to save IP addresses to a file
+// Save IP addresses to a file
 void save_ip_addresses(const std::string &filename, const IPScanner &ip_scanner)
 {
     std::ofstream outFile(filename);
@@ -519,7 +520,7 @@ void save_ip_addresses(const std::string &filename, const IPScanner &ip_scanner)
     }
 }
 
-// Function to load IP addresses from a file
+// Load IP addresses from a file
 void load_ip_addresses(const std::string &filename, IPScanner &ip_scanner)
 {
     std::ifstream inFile(filename);
@@ -538,7 +539,7 @@ void load_ip_addresses(const std::string &filename, IPScanner &ip_scanner)
     }
 }
 
-// UI elements
+// Draw UI elements
 void draw_ui(const string &title_text, UIState &ui_state, Progress &progress, BruteForce &brute_force, IPScanner &ip_scanner)
 {
 
@@ -546,23 +547,23 @@ void draw_ui(const string &title_text, UIState &ui_state, Progress &progress, Br
     clear_screen(COLOR_MISTY_ROSE);
 
     // Draw the Hello Kitty image
-    draw_bitmap(*hello_kitty_image_ptr, 50, 300); // Move Hello Kitty slightly lower
+    draw_bitmap(*hello_kitty_image_ptr, 50, 300); 
 
     // Draw title
-    draw_text(title_text, COLOR_HOT_PINK, game_font(), 30, 150, 50); // Keep title in its original position
+    draw_text(title_text, COLOR_HOT_PINK, game_font(), 30, 150, 50); 
 
     // Draw buttons
-    ui_state.is_button_hovered = is_mouse_over_button(300, 250); // Adjust Start/Stop Scan button position
+    ui_state.is_button_hovered = is_mouse_over_button(300, 250); 
     draw_button(300, 250, "Start/Stop Scan", ui_state.is_button_hovered);
 
-    ui_state.is_restart_button_hovered = is_mouse_over_button(300, 320); // Adjust Restart button position
+    ui_state.is_restart_button_hovered = is_mouse_over_button(300, 320); 
     draw_button(300, 320, "Restart", ui_state.is_restart_button_hovered);
 
     // Display scanning progress
     if (progress.in_progress && progress.value < 1)
     {
-        draw_text("Scanning...", COLOR_HOT_PINK, game_font(), 20, 300, 400); // Move scanning text slightly lower
-        draw_spinner(530, 410, ui_state.spinner_angle);                      // Updated x-coordinate to move spinner to the right
+        draw_text("Scanning...", COLOR_HOT_PINK, game_font(), 20, 300, 400); 
+        draw_spinner(530, 410, ui_state.spinner_angle);                     
 
         // IP generation frequency
         generate_and_store_ip_addresses(ip_scanner);
@@ -605,7 +606,7 @@ void draw_ui(const string &title_text, UIState &ui_state, Progress &progress, Br
     update_and_draw_hearts();
 }
 
-// Function to open the window and load assets
+// Open the window and load assets
 int main()
 {
     sound_effect snd_effect;
@@ -678,7 +679,7 @@ int main()
             }
             else if (!is_entering_username && key_typed(RETURN_KEY))
             {
-                // Finalize password input and start brute force
+                // Finalise password input and start brute force
                 if (!ui_state.input_password.empty())
                 {
                     // Only reset if password changed
@@ -736,10 +737,10 @@ int main()
             // but don't continue testing password combinations
             string encrypted_password = encrypt_password(brute_force.target_password, 3);
 
-            // Display success message with more prominent colors - moved to a higher position
+            // Display success message with more prominent colors 
             draw_text("SUCCESS! Password Cracked: " + brute_force.target_password, COLOR_HOT_PINK, "Arial", 24, 300, 480);
 
-            // Make the encrypted password more visible - moved to a higher position
+            // Make the encrypted password more visible 
             draw_text("Caesar Cipher (Shift 3): " + encrypted_password, COLOR_MEDIUM_VIOLET_RED, "Arial", 24, 300, 510);
         }
 
