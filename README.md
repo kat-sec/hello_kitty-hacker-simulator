@@ -1,0 +1,1 @@
+This is my Hello Kitty Hacker simulator that simulates a hacker dashboard where it brute-forces, encrypts the password while also scans for IP-addresses (fake IPS). I have integrated a file handler that stores program data into a file so that it will be retrieved when the program is executed again. 
